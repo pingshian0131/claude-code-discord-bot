@@ -66,12 +66,16 @@ client.on(Events.MessageCreate, async (message: Message) => {
   // Check whitelist
   if (!ALLOWED_USER_IDS.has(message.author.id)) return;
 
+  console.log(`[Bot] Received message from ${message.author.id}: "${message.content}"`);
+
   // Show typing indicator
   await message.channel.sendTyping();
 
   try {
     const state = await getOrCreateSession(message.author.id, message.channel as DMChannel);
+    console.log(`[Bot] Sending to session, mode: ${state.mode}`);
     await state.session.send(message.content);
+    console.log(`[Bot] Message sent to session successfully`);
   } catch (err) {
     console.error("Error sending message:", err);
     await message.channel.send(
