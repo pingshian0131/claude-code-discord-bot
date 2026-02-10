@@ -5,9 +5,13 @@ import { notifyWorkspaceInfo } from "../utils/git.js";
 import type { UserState } from "./types.js";
 
 export async function startStreamReader(userId: string, state: UserState) {
+  console.log(`[Stream ${userId}] Stream reader started`);
   try {
     for await (const msg of state.session.stream()) {
-      if (state.streamAbort.signal.aborted) break;
+      if (state.streamAbort.signal.aborted) {
+        console.log(`[Stream ${userId}] Stream aborted by signal`);
+        break;
+      }
 
       // Debug: 記錄所有收到的訊息類型
       console.log(`[Stream ${userId}] Received message type: ${msg.type}`);
@@ -72,7 +76,9 @@ export async function startStreamReader(userId: string, state: UserState) {
         console.log(`[Stream ${userId}] Unhandled message type: ${msg.type}`, JSON.stringify(msg).slice(0, 200));
       }
     }
+    console.log(`[Stream ${userId}] Stream ended normally`);
   } catch (err) {
+    console.error(`[Stream ${userId}] Stream error:`, err);
     if (!state.streamAbort.signal.aborted) {
       console.error(`Stream error for user ${userId}:`, err);
       try {
@@ -81,4 +87,5 @@ export async function startStreamReader(userId: string, state: UserState) {
       userStates.delete(userId);
     }
   }
+  console.log(`[Stream ${userId}] Stream reader exited`);
 }

@@ -74,12 +74,19 @@ client.on(Events.MessageCreate, async (message: Message) => {
   try {
     const state = await getOrCreateSession(message.author.id, message.channel as DMChannel);
     console.log(`[Bot] Sending to session, mode: ${state.mode}`);
-    await state.session.send(message.content);
+
+    // 添加超時保護 (30 秒)
+    const sendPromise = state.session.send(message.content);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Session.send() timeout after 30s')), 30000)
+    );
+
+    await Promise.race([sendPromise, timeoutPromise]);
     console.log(`[Bot] Message sent to session successfully`);
   } catch (err) {
-    console.error("Error sending message:", err);
+    console.error("[Bot] Error sending message:", err);
     await message.channel.send(
-      "Failed to send message. Try /reset to start a new session."
+      `❌ Failed to send message: ${err instanceof Error ? err.message : 'Unknown error'}. Try /reset to start a new session.`
     );
   }
 });
