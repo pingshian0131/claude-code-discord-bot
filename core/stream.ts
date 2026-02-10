@@ -6,15 +6,19 @@ import type { UserState } from "./types.js";
 
 export async function startStreamReader(userId: string, state: UserState) {
   console.log(`[Stream ${userId}] Stream reader started`);
-  try {
-    for await (const msg of state.session.stream()) {
-      if (state.streamAbort.signal.aborted) {
-        console.log(`[Stream ${userId}] Stream aborted by signal`);
-        break;
-      }
 
-      // Debug: 記錄所有收到的訊息類型
-      console.log(`[Stream ${userId}] Received message type: ${msg.type}`);
+  // 持續運行直到被明確中止
+  while (!state.streamAbort.signal.aborted) {
+    try {
+      console.log(`[Stream ${userId}] Starting new stream iteration`);
+      for await (const msg of state.session.stream()) {
+        if (state.streamAbort.signal.aborted) {
+          console.log(`[Stream ${userId}] Stream aborted by signal`);
+          break;
+        }
+
+        // Debug: 記錄所有收到的訊息類型
+        console.log(`[Stream ${userId}] Received message type: ${msg.type}`);
 
       // 處理 system init 訊息 - 通知工作資訊
       if (msg.type === "system" && (msg as any).subtype === "init") {
@@ -74,18 +78,25 @@ export async function startStreamReader(userId: string, state: UserState) {
       } else {
         // 記錄未處理的訊息類型
         console.log(`[Stream ${userId}] Unhandled message type: ${msg.type}`, JSON.stringify(msg).slice(0, 200));
+        }
+      }
+      console.log(`[Stream ${userId}] Stream iteration ended normally, waiting for next message...`);
+
+      // 短暫延遲後繼續下一輪
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+    } catch (err) {
+      console.error(`[Stream ${userId}] Stream error:`, err);
+      if (!state.streamAbort.signal.aborted) {
+        console.error(`Stream error for user ${userId}:`, err);
+        try {
+          await state.dmChannel.send("Session ended unexpectedly. Use /reset to start a new one.");
+        } catch {}
+        userStates.delete(userId);
+        break; // 出錯時退出循環
       }
     }
-    console.log(`[Stream ${userId}] Stream ended normally`);
-  } catch (err) {
-    console.error(`[Stream ${userId}] Stream error:`, err);
-    if (!state.streamAbort.signal.aborted) {
-      console.error(`Stream error for user ${userId}:`, err);
-      try {
-        await state.dmChannel.send("Session ended unexpectedly. Use /reset to start a new one.");
-      } catch {}
-      userStates.delete(userId);
-    }
   }
+
   console.log(`[Stream ${userId}] Stream reader exited`);
 }
