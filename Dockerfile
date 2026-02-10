@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# 1) 系統依賴（Panamera Python packages 需要）+ Node.js 22
+# 1) 系統依賴（Panamera Python packages 需要）+ Node.js 22 + Claude Code CLI
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
     build-essential \
@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g @anthropic-ai/claude-code \
     && rm -rf /var/lib/apt/lists/*
 
 # 2) Python 依賴（從 Panamera Pipfile 安裝）
