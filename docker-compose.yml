@@ -15,7 +15,7 @@ services:
       # 掛載目標專案（Claude Code 工作目錄）
       - ${WORK_DIR:-./}:/workspace
       # 掛載 Claude 認證（使用絕對路徑）
-      - /Users/ping/.claude:/root/.claude
+      - /home/ubuntu-beelink/.claude:/root/.claude
     deploy:
       resources:
         limits:
