@@ -1,0 +1,28 @@
+services:
+  claude-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude-code-bot
+    restart: unless-stopped
+    working_dir: /workspace
+    env_file:
+      - .env
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - HOME=/root
+    volumes:
+      # 掛載目標專案（Claude Code 工作目錄）
+      - ${WORK_DIR:-./}:/workspace
+      # 掛載 Claude 認證
+      - ${CLAUDE_CONFIG:-~/.claude}:/root/.claude
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
