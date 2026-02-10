@@ -20,13 +20,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && npm install -g @anthropic-ai/claude-code \
     && rm -rf /var/lib/apt/lists/*
 
-# 2) Python 依賴（從 Panamera Pipfile 安裝）
-WORKDIR /tmp/python-deps
-COPY panamera-deps/Pipfile panamera-deps/Pipfile.lock ./
+# 2) 安裝 pipenv（不預先安裝 project 的 Python dependencies）
 RUN pip install "pip<24.1" && \
-    pip install pipenv==2022.4.20 && \
-    pipenv install --dev --system && \
-    rm -rf /tmp/python-deps
+    pip install pipenv==2022.4.20
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1

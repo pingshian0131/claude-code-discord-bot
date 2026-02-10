@@ -39,6 +39,3 @@ coverage/
 # Claude
 .claude/
 .claude_output/
-
-# Docker
-panamera-deps/
