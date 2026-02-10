@@ -13,6 +13,8 @@
 
 ## 架構說明
 
+### 系統架構
+
 ```
 bot.ts (Discord Bot)
   ↓
@@ -21,6 +23,25 @@ Claude Agent SDK (@anthropic-ai/claude-agent-sdk)
 Spawns → Claude Code CLI (bundled)
   ↓
 操作 /workspace (mounted project)
+```
+
+### 程式架構（模組化設計）
+
+```
+claude-code-agent/
+├── bot.ts                    # Discord 客戶端入口 (事件監聽)
+├── commands/                 # Slash Commands 模組
+│   ├── index.ts             # 命令註冊與路由
+│   ├── reset.ts             # /reset - 重置 session
+│   ├── models.ts            # /models - 切換模型
+│   └── mode.ts              # /mode - 切換權限模式
+├── core/                     # 核心功能模組
+│   ├── types.ts             # 型別定義、常數與全域狀態
+│   ├── session.ts           # Session 生命週期管理
+│   └── stream.ts            # Claude 回應串流處理
+└── utils/                    # 工具函式模組
+    ├── git.ts               # Git 狀態查詢與格式化
+    └── message.ts           # 訊息分割與傳送
 ```
 
 ## 環境需求
@@ -203,16 +224,80 @@ WORK_DIR=/path/to/another/project docker compose up -d
 
 ```
 .
-├── bot.ts              # Discord Bot 主程式
-├── package.json        # Node.js 依賴
-├── tsconfig.json       # TypeScript 配置
-├── Dockerfile          # Docker 映像檔定義
-├── docker-compose.yml  # Docker Compose 配置
-├── .dockerignore       # Docker build 排除檔案
-├── .env                # 環境變數（不納入版控）
-├── .env.example        # 環境變數範本
-└── README.md           # 本文件
+├── bot.ts              # Discord Bot 主程式（事件處理器）
+├── commands/           # Slash Commands 模組
+│   ├── index.ts       # 命令註冊與路由
+│   ├── reset.ts       # /reset 命令
+│   ├── models.ts      # /models 命令
+│   └── mode.ts        # /mode 命令
+├── core/              # 核心功能模組
+│   ├── types.ts       # 型別定義與常數
+│   ├── session.ts     # Session 管理
+│   └── stream.ts      # Stream 處理
+├── utils/             # 工具函式
+│   ├── git.ts         # Git 工具
+│   └── message.ts     # 訊息工具
+├── package.json       # Node.js 依賴
+├── tsconfig.json      # TypeScript 配置
+├── Dockerfile         # Docker 映像檔定義
+├── docker-compose.yml # Docker Compose 配置
+├── .dockerignore      # Docker build 排除檔案
+├── .env               # 環境變數（不納入版控）
+├── .env.example       # 環境變數範本
+└── README.md          # 本文件
 ```
+
+## 開發指南
+
+### 新增 Slash Command
+
+1. 在 [commands/](commands/) 目錄建立新檔案（例如 `hello.ts`）:
+
+```typescript
+import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
+
+export const data = new SlashCommandBuilder()
+  .setName("hello")
+  .setDescription("Say hello");
+
+export async function execute(interaction: CommandInteraction) {
+  await interaction.reply("Hello! 👋");
+}
+```
+
+2. 在 [commands/index.ts](commands/index.ts) 中匯入新命令:
+
+```typescript
+import * as helloCommand from "./hello";
+
+const commands = [
+  resetCommand,
+  modelsCommand,
+  modeCommand,
+  helloCommand,  // 新增這行
+];
+```
+
+3. 重啟 bot，命令會自動註冊到 Discord
+
+### 模組職責
+
+| 模組 | 職責 | 何時修改 |
+|-----|------|---------|
+| [bot.ts](bot.ts) | Discord 事件監聽、路由 | 新增事件處理器 |
+| [commands/](commands/) | Slash command 定義與執行 | 新增/修改命令 |
+| [core/session.ts](core/session.ts) | Session 生命週期、權限管理 | 修改 session 行為 |
+| [core/stream.ts](core/stream.ts) | Claude 回應處理 | 修改訊息處理邏輯 |
+| [core/types.ts](core/types.ts) | 型別與常數定義 | 新增共用型別 |
+| [utils/](utils/) | 可重用的工具函式 | 新增工具函式 |
+
+### 架構優勢
+
+- ✅ **關注點分離**：命令、核心邏輯、工具函式各自獨立
+- ✅ **易於測試**：每個模組可單獨測試
+- ✅ **可擴展性**：新增功能不影響現有程式碼
+- ✅ **可讀性**：主程式從 611 行減少到 98 行
+- ✅ **型別安全**：完整的 TypeScript 支援
 
 ## 技術棧
 
