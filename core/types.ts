@@ -9,6 +9,7 @@ export const ALLOWED_USER_IDS = new Set(
   (process.env.ALLOWED_USER_IDS ?? "").split(",").filter(Boolean)
 );
 export const DEFAULT_MODEL = process.env.CLAUDE_MODEL ?? "claude-sonnet-4-5-20250929";
+export const WORK_DIR = process.env.WORK_DIR || process.cwd();
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

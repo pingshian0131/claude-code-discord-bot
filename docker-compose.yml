@@ -11,6 +11,7 @@ services:
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - HOME=/root
+      - WORK_DIR=/workspace
     volumes:
       # 掛載目標專案（Claude Code 工作目錄）
       - ${WORK_DIR:-./}:/workspace
