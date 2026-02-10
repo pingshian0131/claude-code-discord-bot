@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
-import { destroySession } from "../core/session";
+import { destroySession } from "../core/session.js";
 
 export const data = new SlashCommandBuilder()
   .setName("reset")

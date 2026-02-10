@@ -9,8 +9,8 @@ import {
   ButtonStyle,
   type DMChannel,
 } from "discord.js";
-import { DEFAULT_MODEL, userStates, type Mode, type UserState } from "./types";
-import { startStreamReader } from "./stream";
+import { DEFAULT_MODEL, userStates, type Mode, type UserState } from "./types.js";
+import { startStreamReader } from "./stream.js";
 
 function buildSessionOptions(userId: string, mode: Mode, model: string) {
   const base = { model } as const;

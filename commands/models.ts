@@ -7,8 +7,8 @@ import {
   type StringSelectMenuInteraction,
   type DMChannel,
 } from "discord.js";
-import { DEFAULT_MODEL, MODELS, userStates } from "../core/types";
-import { recreateSession } from "../core/session";
+import { DEFAULT_MODEL, MODELS, userStates } from "../core/types.js";
+import { recreateSession } from "../core/session.js";
 
 export const data = new SlashCommandBuilder()
   .setName("models")

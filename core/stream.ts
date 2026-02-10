@@ -1,8 +1,8 @@
 import type { SDKAssistantMessage } from "@anthropic-ai/claude-agent-sdk";
-import { userStates } from "./types";
-import { extractText, sendLongMessage } from "../utils/message";
-import { notifyWorkspaceInfo } from "../utils/git";
-import type { UserState } from "./types";
+import { userStates } from "./types.js";
+import { extractText, sendLongMessage } from "../utils/message.js";
+import { notifyWorkspaceInfo } from "../utils/git.js";
+import type { UserState } from "./types.js";
 
 export async function startStreamReader(userId: string, state: UserState) {
   try {

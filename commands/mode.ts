@@ -7,8 +7,8 @@ import {
   type StringSelectMenuInteraction,
   type DMChannel,
 } from "discord.js";
-import { MODE_LABELS, userStates, type Mode } from "../core/types";
-import { recreateSession } from "../core/session";
+import { MODE_LABELS, userStates, type Mode } from "../core/types.js";
+import { recreateSession } from "../core/session.js";
 
 export const data = new SlashCommandBuilder()
   .setName("mode")

@@ -13,9 +13,9 @@ import {
   DISCORD_TOKEN,
   DISCORD_APPLICATION_ID,
   ALLOWED_USER_IDS,
-} from "./core/types";
-import { getOrCreateSession, destroySession } from "./core/session";
-import { registerCommands, handleCommand, handleSelectMenu } from "./commands";
+} from "./core/types.js";
+import { getOrCreateSession, destroySession } from "./core/session.js";
+import { registerCommands, handleCommand, handleSelectMenu } from "./commands/index.js";
 
 // ─── Discord Client ──────────────────────────────────────────────────────────
 
@@ -86,12 +86,14 @@ client.login(DISCORD_TOKEN);
 
 function shutdown() {
   console.log("\nShutting down...");
-  const { userStates } = require("./core/types");
-  for (const [userId] of userStates) {
-    destroySession(userId);
-  }
-  client.destroy();
-  process.exit(0);
+  // Import userStates dynamically to avoid circular dependency
+  import("./core/types.js").then(({ userStates }) => {
+    for (const [userId] of userStates) {
+      destroySession(userId);
+    }
+    client.destroy();
+    process.exit(0);
+  });
 }
 
 process.on("SIGINT", shutdown);

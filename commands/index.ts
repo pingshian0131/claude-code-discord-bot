@@ -1,8 +1,8 @@
 import { REST, Routes } from "discord.js";
 import type { CommandInteraction, StringSelectMenuInteraction } from "discord.js";
-import * as resetCommand from "./reset";
-import * as modelsCommand from "./models";
-import * as modeCommand from "./mode";
+import * as resetCommand from "./reset.js";
+import * as modelsCommand from "./models.js";
+import * as modeCommand from "./mode.js";
 
 // 命令集合
 const commands = [
