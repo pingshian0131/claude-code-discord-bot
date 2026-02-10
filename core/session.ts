@@ -44,7 +44,8 @@ function createAutoApproveTool(userId: string) {
     options: { signal: AbortSignal; toolUseID: string }
   ) => {
     console.log(`[AutoEdit ${userId}] Auto-approving tool: ${toolName}`);
-    return { behavior: "allow" as const };
+    // 必須返回 updatedInput，即使沒有修改也要傳入原始 input
+    return { behavior: "allow" as const, updatedInput: input };
   };
 }
 
