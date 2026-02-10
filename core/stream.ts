@@ -9,6 +9,9 @@ export async function startStreamReader(userId: string, state: UserState) {
     for await (const msg of state.session.stream()) {
       if (state.streamAbort.signal.aborted) break;
 
+      // Debug: 記錄所有收到的訊息類型
+      console.log(`[Stream ${userId}] Received message type: ${msg.type}`);
+
       // 處理 system init 訊息 - 通知工作資訊
       if (msg.type === "system" && (msg as any).subtype === "init") {
         const cwd = (msg as any).cwd;
@@ -22,10 +25,12 @@ export async function startStreamReader(userId: string, state: UserState) {
 
       if (msg.type === "assistant") {
         const text = extractText(msg as SDKAssistantMessage);
+        console.log(`[Stream ${userId}] Assistant text length: ${text?.length || 0}`);
         if (text) {
           await sendLongMessage(state.dmChannel, text);
         }
       } else if (msg.type === "result") {
+        console.log(`[Stream ${userId}] Result - is_error: ${"is_error" in msg && msg.is_error}`);
         if ("is_error" in msg && msg.is_error) {
           // 處理錯誤結果
           const errText =
@@ -40,6 +45,7 @@ export async function startStreamReader(userId: string, state: UserState) {
               ? msg.result
               : JSON.stringify(msg.result, null, 2);
 
+          console.log(`[Stream ${userId}] Success result length: ${resultContent.length}`);
           // 只有在結果內容有實質內容時才發送
           if (resultContent.trim()) {
             // 使用程式碼區塊格式化輸出，提升可讀性
@@ -47,6 +53,9 @@ export async function startStreamReader(userId: string, state: UserState) {
             await sendLongMessage(state.dmChannel, formattedResult);
           }
         }
+      } else {
+        // 記錄未處理的訊息類型
+        console.log(`[Stream ${userId}] Unhandled message type: ${msg.type}`, JSON.stringify(msg).slice(0, 200));
       }
     }
   } catch (err) {
