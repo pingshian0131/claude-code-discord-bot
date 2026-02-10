@@ -10,13 +10,13 @@ services:
       - .env
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - HOME=/root
+      - HOME=/home/appuser
       - WORK_DIR=/workspace
     volumes:
       # 掛載目標專案（Claude Code 工作目錄）
       - ${WORK_DIR:-./}:/workspace
       # 掛載 Claude 認證
-      - ${CLAUDE_CONFIG:-~/.claude}:/root/.claude
+      - ${CLAUDE_CONFIG:-~/.claude}:/home/appuser/.claude
     deploy:
       resources:
         limits:
