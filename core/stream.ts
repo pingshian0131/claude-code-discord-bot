@@ -27,11 +27,25 @@ export async function startStreamReader(userId: string, state: UserState) {
         }
       } else if (msg.type === "result") {
         if ("is_error" in msg && msg.is_error) {
+          // 處理錯誤結果
           const errText =
             "result" in msg && typeof msg.result === "string"
               ? msg.result
               : "An error occurred.";
           await sendLongMessage(state.dmChannel, `**Error:** ${errText}`);
+        } else if ("result" in msg && msg.result) {
+          // 處理成功結果
+          const resultContent =
+            typeof msg.result === "string"
+              ? msg.result
+              : JSON.stringify(msg.result, null, 2);
+
+          // 只有在結果內容有實質內容時才發送
+          if (resultContent.trim()) {
+            // 使用程式碼區塊格式化輸出，提升可讀性
+            const formattedResult = `\`\`\`\n${resultContent}\n\`\`\``;
+            await sendLongMessage(state.dmChannel, formattedResult);
+          }
         }
       }
     }
