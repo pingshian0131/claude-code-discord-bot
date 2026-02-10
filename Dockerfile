@@ -29,9 +29,9 @@ ENV PYTHONUNBUFFERED=1
 
 # 3) Node.js Bot 應用
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm ci
-COPY bot.ts tsconfig.json ./
+COPY . .
 
 # 4) Workspace 目錄（掛載點）
 RUN mkdir -p /workspace
