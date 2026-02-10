@@ -29,6 +29,20 @@ export async function startStreamReader(userId: string, state: UserState) {
         if (text) {
           await sendLongMessage(state.dmChannel, text);
         }
+      } else if (msg.type === "user") {
+        // 處理 SDK 回傳的 user 訊息（通常是 tool_result）
+        const message = (msg as any).message;
+        if (message?.content) {
+          for (const item of message.content) {
+            if (item.type === "tool_result" && item.is_error) {
+              console.log(`[Stream ${userId}] Tool error: ${item.content}`);
+              await sendLongMessage(
+                state.dmChannel,
+                `⚠️ **工具執行失敗**\n${item.content}\n\n提示：如果你在 Auto-Edit 模式，請切換到 Edit & Ask 模式來批准工具執行。`
+              );
+            }
+          }
+        }
       } else if (msg.type === "result") {
         console.log(`[Stream ${userId}] Result - is_error: ${"is_error" in msg && msg.is_error}`);
         if ("is_error" in msg && msg.is_error) {

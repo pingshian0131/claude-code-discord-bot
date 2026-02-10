@@ -22,7 +22,12 @@ function buildSessionOptions(userId: string, mode: Mode, model: string) {
     case "plan":
       return { ...base, permissionMode: "plan" as const };
     case "autoEdit":
-      return { ...base, permissionMode: "acceptEdits" as const };
+      // 使用自訂 canUseTool 來自動批准所有工具
+      return {
+        ...base,
+        permissionMode: "default" as const,
+        canUseTool: createAutoApproveTool(userId),
+      };
     case "editAsk":
       return {
         ...base,
@@ -30,6 +35,17 @@ function buildSessionOptions(userId: string, mode: Mode, model: string) {
         canUseTool: createCanUseTool(userId),
       };
   }
+}
+
+function createAutoApproveTool(userId: string) {
+  return async (
+    toolName: string,
+    input: Record<string, unknown>,
+    options: { signal: AbortSignal; toolUseID: string }
+  ) => {
+    console.log(`[AutoEdit ${userId}] Auto-approving tool: ${toolName}`);
+    return { behavior: "allow" as const };
+  };
 }
 
 function createCanUseTool(userId: string) {
