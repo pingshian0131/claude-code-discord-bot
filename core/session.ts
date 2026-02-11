@@ -118,7 +118,14 @@ export async function getOrCreateSession(
   const session = unstable_v2_createSession(options);
   const streamAbort = new AbortController();
 
-  const state: UserState = { session, model, mode, dmChannel: channel, streamAbort };
+  const state: UserState = {
+    session,
+    model,
+    mode,
+    dmChannel: channel,
+    streamAbort,
+    workspaceInfoShown: false, // 初始化為未顯示
+  };
   userStates.set(userId, state);
 
   // Start background stream reader
@@ -146,7 +153,14 @@ export async function recreateSession(userId: string, channel: DMChannel) {
   const session = unstable_v2_createSession(options);
   const streamAbort = new AbortController();
 
-  const state: UserState = { session, model, mode, dmChannel: channel, streamAbort };
+  const state: UserState = {
+    session,
+    model,
+    mode,
+    dmChannel: channel,
+    streamAbort,
+    workspaceInfoShown: false, // 重置為未顯示（/reset 時會重新顯示）
+  };
   userStates.set(userId, state);
   startStreamReader(userId, state);
 

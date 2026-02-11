@@ -20,10 +20,12 @@ export async function startStreamReader(userId: string, state: UserState) {
         // Debug: 記錄所有收到的訊息類型
         console.log(`[Stream ${userId}] Received message type: ${msg.type}`);
 
-      // 處理 system init 訊息 - 通知工作資訊
+      // 處理 system init 訊息 - 通知工作資訊（只在第一次顯示）
       if (msg.type === "system" && (msg as any).subtype === "init") {
         const cwd = (msg as any).cwd;
-        if (cwd) {
+        if (cwd && !state.workspaceInfoShown) {
+          console.log(`[Stream ${userId}] Showing workspace info for the first time`);
+          state.workspaceInfoShown = true;
           // 非同步執行,不阻塞後續訊息處理
           notifyWorkspaceInfo(state.dmChannel, cwd).catch(err => {
             console.error(`Failed to notify workspace info for user ${userId}:`, err);

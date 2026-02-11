@@ -43,6 +43,7 @@ export interface UserState {
   mode: Mode;
   dmChannel: DMChannel;
   streamAbort: AbortController;
+  workspaceInfoShown: boolean; // 追蹤是否已顯示工作資訊
 }
 
 export const userStates = new Map<string, UserState>();
