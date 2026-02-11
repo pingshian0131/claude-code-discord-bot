@@ -3,12 +3,14 @@ import type { CommandInteraction, StringSelectMenuInteraction } from "discord.js
 import * as resetCommand from "./reset.js";
 import * as modelsCommand from "./models.js";
 import * as modeCommand from "./mode.js";
+import * as stopCommand from "./stop.js";
 
 // 命令集合
 const commands = [
   resetCommand,
   modelsCommand,
   modeCommand,
+  stopCommand,
 ];
 
 // 註冊所有 slash commands 到 Discord

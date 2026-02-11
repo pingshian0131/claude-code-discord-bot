@@ -94,7 +94,7 @@ function createCanUseTool(userId: string) {
       await interaction.update({ components: [] });
 
       if (interaction.customId.startsWith("tool_allow_")) {
-        return { behavior: "allow" as const };
+        return { behavior: "allow" as const, updatedInput: input };
       }
       return { behavior: "deny" as const, message: "User denied the tool." };
     } catch {

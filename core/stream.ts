@@ -48,7 +48,7 @@ export async function startStreamReader(userId: string, state: UserState) {
               console.log(`[Stream ${userId}] Tool error: ${item.content}`);
               await sendLongMessage(
                 state.dmChannel,
-                `⚠️ **工具執行失敗**\n${item.content}\n\n提示：如果你在 Auto-Edit 模式，請切換到 Edit & Ask 模式來批准工具執行。`
+                `⚠️ **工具執行失敗**\n${item.content}`
               );
             }
           }
