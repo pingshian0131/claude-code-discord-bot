@@ -14,7 +14,8 @@ import {
   DISCORD_APPLICATION_ID,
   ALLOWED_USER_IDS,
 } from "./core/types.js";
-import { getOrCreateSession, destroySession } from "./core/session.js";
+import { getOrCreateSession, destroySession, recreateSession } from "./core/session.js";
+import { userStates } from "./core/types.js";
 import { registerCommands, handleCommand, handleSelectMenu } from "./commands/index.js";
 
 // ─── Discord Client ──────────────────────────────────────────────────────────
@@ -67,6 +68,24 @@ client.on(Events.MessageCreate, async (message: Message) => {
   if (!ALLOWED_USER_IDS.has(message.author.id)) return;
 
   console.log(`[Bot] Received message from ${message.author.id}: "${message.content}"`);
+
+  // 攔截文字指令
+  const trimmed = message.content.trim().toLowerCase();
+  if (trimmed === "/stop") {
+    const state = userStates.get(message.author.id);
+    if (state) {
+      await recreateSession(message.author.id, message.channel as DMChannel);
+      await message.reply("⏹️ Execution stopped.");
+    } else {
+      await message.reply("No active session.");
+    }
+    return;
+  }
+  if (trimmed === "/reset") {
+    destroySession(message.author.id);
+    await message.reply("Session reset. Your next message will start a new conversation.");
+    return;
+  }
 
   // Show typing indicator
   await message.channel.sendTyping();
