@@ -15,6 +15,8 @@ services:
     volumes:
       # 掛載目標專案（Claude Code 工作目錄）
       - ${WORK_DIR:-./}:/workspace
+      # 持久化 venv，避免每次重建 container 都要重裝
+      - workspace-venv:/workspace/venv
       # 掛載 Claude 認證
       - ${CLAUDE_CONFIG:-~/.claude}:/home/appuser/.claude
     deploy:
@@ -27,3 +29,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  workspace-venv:
