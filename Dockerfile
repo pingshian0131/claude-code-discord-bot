@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libffi-dev \
     git \
     curl \
+    vim \
     ca-certificates \
     gnupg \
     sudo \
